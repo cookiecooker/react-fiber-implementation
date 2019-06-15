@@ -1,3 +1,5 @@
+import { scheduleWork } from "./life-cycle-functions";
+
 export class Component {
     constructor(props, context) {
         this.props = props
