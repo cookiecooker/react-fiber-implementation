@@ -43,9 +43,30 @@ function reconcileChildrenArray(currentFiber, newChildren) {
         }
 
         if (!isSameFiber && oldFiber) {
-
+            newFiber = placeChild(currentFiber, newChild)
         }
+
+        if (!isSameFiber && oldFiber) {
+            // the number of new nodes is less than that of old nodes
+            // put changed effect to current node's list
+            oldFiber.effectTag = DELETION
+            currentFiber.effects = currentFiber.effects || []
+            currentFiber.effects.push(oldFiber)
+        }
+
+        if (oldFiber) {
+            oldFiber = oldFiber.sibling || null
+        }
+
+        if (index === 0) {
+            currentFiber.child = newFiber
+        } else if (prevFiber && newChild) {
+            prevFiber.sibling = newFiber
+        }
+
+        index++
     }
+    return currentFiber.child
 }
 
 
