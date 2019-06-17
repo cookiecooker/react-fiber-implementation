@@ -103,6 +103,24 @@ function commitWork(effectFiber) {
     }
 }
 
+function commitDeletion(fiber, domParent) {
+    let node = fiber
+    while (true) {
+        if (node.tag == tag.ClassComponent) {
+            node = node.child
+            continue
+        }
+        domParent.removeChild(node.stateNode)
+        while (node != fiber && !node.sibling) {
+            node = node.return
+        }
+        if (node == fiber) {
+            return
+        }
+        node = node.sibling
+    }
+}
+
 
 export {
     placeChild,
