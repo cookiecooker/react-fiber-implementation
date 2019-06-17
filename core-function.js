@@ -69,6 +69,40 @@ function reconcileChildrenArray(currentFiber, newChildren) {
     return currentFiber.child
 }
 
+function commitAllwork(topFiber) {
+    topFiber.effects.forEach(f => {
+        commitWork(f)
+    })
+
+    topFiber.stateNode._rootContainerFiber = topFiber
+    topFiber.effects = []
+    nextUnitOfWork = null
+    pendingCommit = null
+}
+
+function commitWork(effectFiber) {
+    if (effectFiber.tag === tag.HostRoot) {
+        // do nothing for root node
+        return
+    }
+
+    let domParentFiber = effectFiber.return
+    while (domParentFiber.tag === tag.ClassComponent || domParentFiber.tag === tag.FunctionalComponent) {
+        domParentFiber = domParentFiber.return
+    }
+
+    const domParent = domParentFiber.stateNode
+    if (effectFiber.effectTag === PLACEMENT) {
+        if (effectFiber.tag === tag.HostComponent || effectFiber.tag === tag.HostText) {
+            domParent.appendChild(effectFiber.stateNode)
+        }
+    } else if (effectFiber.effectTag === UPDATE) {
+        //update logic
+    } else if (effectFiber.effectTag === DELETION) {
+        commitDeletion(effectFiber, domParent)
+    }
+}
+
 
 export {
     placeChild,

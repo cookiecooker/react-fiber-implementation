@@ -163,6 +163,21 @@ function createInstance(fiber) {
     return instance
 }
 
+function completeWork(currentFiber) {
+    if (currentFiber.tag === tag.classComponent) {
+        currentFiber.stateNode._internalfiber = currentFiber
+    }
+
+    if (currentFiber.return) {
+        const currentEffect = currentFiber.effects || []
+        const currentEffectTag = currentFiber.effectTag ? [currentFiber] : []
+        const parentEffects = currentFiber.return.effects || []
+        currentFiber.return.effects = parentEffects.concat(currentEffect, currentEffectTag)
+    } else {
+        pendingCommit = currentFiber
+    }
+}
+
 export {
     render,
     scheduleWork,
